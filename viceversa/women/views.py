@@ -1,25 +1,14 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseNotFound, Http404
 
-
 from .models import *
-
-menu = [
-    {'title': "About", 'url_name': 'about'},
-    {'title': "New Post", 'url_name': "add_post"},
-    {'title': "Feedback", 'url_name': "feedback"},
-    {'title': "Sign-in", 'url_name': "sign-in"},
-]
 
 
 # Create your views here.
 def index(request):
     posts = Women.objects.all()
-    cats = Category.objects.all()
     context = {
         'posts': posts,
-        'cats': cats,
-        'menu': menu,
         'title': "Main page",
         'cat_selected': 0,
     }
@@ -27,7 +16,7 @@ def index(request):
 
 
 def about(request):
-    return render(request, 'women/about.html', {'menu': menu, 'title': "About site"})
+    return render(request, 'women/about.html', {'title': "About site"})
 
 
 def add_post(request):
@@ -48,15 +37,12 @@ def show_post(request, post_id):
 
 def show_category(request, cat_id):
     posts = Women.objects.filter(cat_id=cat_id)
-    cats = Category.objects.all()
 
     if len(posts) == 0:
         raise Http404()
 
     context = {
         'posts': posts,
-        'cats': cats,
-        'menu': menu,
         'title': "Showing by categories",
         'cat_selected': cat_id,
     }
