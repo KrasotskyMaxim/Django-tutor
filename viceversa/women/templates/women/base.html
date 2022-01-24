@@ -17,7 +17,14 @@
 		<div class="header">
 			<ul id="mainmenu" class="mainmenu">
 			<li class="logo"><a href="{% url 'home' %}"><div class="logo"></div></a></li>
-				{% show_menu %}
+			{% for m in menu %}
+				<li><a href="{% url m.url_name %}">{{m.title}}</a></li>
+			{% endfor %}
+				{% if user.is_authenticated %}
+				<li class="last">{{user.username}} | <a href="{% url 'sign-out' %}">Exit</a></li>
+				{% else %}
+				<li class="last"><a href="{% url 'register' %}">Login</a> | <a href="{% url 'sign-in' %}">Sign-in</a></li>
+				{% endif %}
 			</ul>
 			<div class="clear"></div>
 		</div>
@@ -37,7 +44,15 @@
 		<li><a href="{% url 'home' %}">All categories</a></li>
 {% endif %}
 
-{% show_categories sort='name' cat_selected=cat_selected %}
+{% for c in cats %}
+{% if c.women__count > 0 %}
+	{% if c.pk == cat_selected %}
+		<li class="selected">{{c.name}}</li>
+	{% else %}
+		<li><a href="{{ c.get_absolute_url }}">{{c.name}}</a></li>
+	{% endif %}
+{% endif %}
+{% endfor %}
 
 		<li class="share">
 		<p>Our channel</p>
@@ -52,9 +67,34 @@
 	{% endblock %}
 
 <!-- Блок контента -->
-	<div class="content-text">
+	<div class='content-text'>
 {% block content %}
 {% endblock %}
+{% if page_obj.has_other_pages %}
+<nav class="list-pages">
+	<ul>
+		{% if page_obj.has_previous %}
+		<li class="page-num">
+			<a href="?page={{page_obj.previous_page_number}}">&lt;</a>
+		</li>
+		{% endif %}
+		{% for p in paginator.page_range %}
+		{% if page_obj.number == p %}
+		<li class="page-num page-num-selected">{{p}}</li>
+		{% elif p >= page_obj.number|add:-1 and p <= page_obj.number|add:1 %}
+		<li class='page-num'>
+			<a href="?page={{p}}">{{p}}</a>
+		</li>
+		{% endif %}
+		{% endfor %}
+		{% if page_obj.has_next %}
+		<li class="page-num">
+			<a href="?page={{page_obj.next_page_number}}">&gt;</a>
+		</li>
+		{% endif %}
+	</ul>
+</nav>
+{% endif %}
 	</div>
 <!-- Конец блока контента -->
 
